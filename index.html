@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guia Interativo de Git e GitHub</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+            },
+            git: {
+              orange: '#f05032',
+              purple: '#6e5494',
+              green: '#2ea44f',
+              dark: '#0d1117',
+              card: '#161b22',
+              border: '#30363d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* CSS Personalizado Adicional */
+    html { scroll-behavior: smooth; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0d1117; }
+    ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+    /* Efeito de brilho de gradiente */
+    .glow-effect {
+      position: relative;
+    }
+    .glow-effect::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px; right: -2px; bottom: -2px;
+      background: linear-gradient(45deg, #f05032, #6e5494, #0ea5e9);
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .glow-effect:hover::before {
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body class="bg-[#0d1117] text-gray-200 font-sans antialiased selection:bg-git-orange selection:text-white min-h-screen flex flex-col">
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-git-green text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 border border-green-400/30 pointer-events-none">
+    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+    <span id="toast-message" class="font-medium text-sm">Comando copiado com sucesso!</span>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-40 bg-[#0d1117]/80 backdrop-blur-md border-b border-git-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-git-orange/10 border border-git-orange/30 rounded-lg text-git-orange">
+            <i data-lucide="git-branch" class="w-6 h-6"></i>
+          </div>
+          <span class="font-bold text-xl text-white tracking-tight">GitDev<span class="text-git-orange">.Guide</span></span>
+        </div>
+
+        <nav class="hidden md:flex space-x-6 text-sm font-medium">
+          <a href="#vcs" class="text-gray-400 hover:text-white transition-colors">O que é VCS?</a>
+          <a href="#git" class="text-gray-400 hover:text-white transition-colors">Git</a>
+          <a href="#github" class="text-gray-400 hover:text-white transition-colors">GitHub</a>
+          <a href="#fluxo" class="text-gray-400 hover:text-white transition-colors">Fluxo de Trabalho</a>
+          <a href="#cheatsheet" class="text-gray-400 hover:text-white transition-colors">Cheat Sheet</a>
+          <a href="#quiz" class="text-gray-400 hover:text-white transition-colors">Quiz</a>
+        </nav>
+
+        <a href="#cheatsheet" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-git-orange hover:bg-orange-600 text-white transition-all shadow-lg shadow-git-orange/20">
+          <i data-lucide="terminal" class="w-4 h-4"></i> Comandos Rápidos
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow">
+    <!-- Hero Section -->
+    <section class="relative py-20 overflow-hidden border-b border-git-border bg-gradient-to-b from-[#161b22] to-[#0d1117]">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-git-orange/10 border border-git-orange/30 text-git-orange text-xs font-mono mb-6">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Guia Interativo para Desenvolvedores
+        </div>
+        <h1 class="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-tight mb-6">
+          Domine o <span class="text-transparent bg-clip-text bg-gradient-to-r from-git-orange to-orange-400">Git</span> e o <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-git-purple">GitHub</span> do Zero
+        </h1>
+        <p class="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+          Aprenda os conceitos vitais de versionamento de código, os comandos essenciais e como trabalhar em equipe no GitHub de forma didática e visual.
+        </p>
+
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="#git" class="px-6 py-3 rounded-xl bg-git-orange hover:bg-orange-600 text-white font-semibold flex items-center gap-2 transition-all shadow-lg shadow-git-orange/25">
+            <i data-lucide="play-circle" class="w-5 h-5"></i> Começar o Guia
+          </a>
+          <a href="#quiz" class="px-6 py-3 rounded-xl bg-git-card hover:bg-git-border text-gray-200 font-semibold border border-git-border flex items-center gap-2 transition-all">
+            <i data-lucide="help-circle" class="w-5 h-5"></i> Testar Conhecimentos
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 1: O que é Versionamento (VCS) -->
+    <section id="vcs" class="py-16 border-b border-git-border">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">1. O que é Versionamento de Código (VCS)?</h2>
+          <p class="text-gray-400">Um Sistema de Controle de Versão (VCS) é como uma "máquina do tempo" para o seu código-fonte, registrando todas as alterações efetuadas no projeto.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 mb-12">
+          <div class="bg-git-card border border-git-border p-6 rounded-xl">
+            <div class="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="history" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Histórico Completo</h3>
+            <p class="text-sm text-gray-400">Saiba exatamente quem alterou cada linha de código, quando e por qual motivo. Nunca mais perca um código antigo.</p>
+          </div>
+
+          <div class="bg-git-card border border-git-border p-6 rounded-xl">
+            <div class="w-12 h-12 bg-green-500/10 text-green-400 rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Trabalho em Equipe</h3>
+            <p class="text-sm text-gray-400">Múltiplos desenvolvedores podem trabalhar no mesmo projeto simultaneamente sem sobrescrever o trabalho do outro.</p>
+          </div>
+
+          <div class="bg-git-card border border-git-border p-6 rounded-xl">
+            <div class="w-12 h-12 bg-purple-500/10 text-purple-400 rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="shield-check" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Segurança e Reversão</h3>
+            <p class="text-sm text-gray-400">Cometeu um erro grave em produção? É possível retornar o projeto para uma versão estável anterior em segundos.</p>
+          </div>
+        </div>
+
+        <!-- Centralizado vs Distribuído -->
+        <div class="bg-git-card border border-git-border rounded-xl p-6 md:p-8">
+          <h3 class="text-xl font-bold text-white mb-6 text-center">Centralizado vs. Distribuído</h3>
+          <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-[#0d1117] p-5 rounded-lg border border-git-border">
+              <span class="inline-block px-2.5 py-1 bg-amber-500/10 text-amber-400 text-xs font-semibold rounded mb-3">Sistemas Centralizados (ex: SVN)</span>
+              <p class="text-sm text-gray-400 mb-4">Existe apenas um único servidor central onde todo o histórico do código fica guardado. Se o servidor cair, ninguém consegue fazer alterações com histórico.</p>
+              <div class="flex items-center justify-center py-4 text-amber-400/80">
+                <i data-lucide="server" class="w-12 h-12"></i>
+              </div>
+            </div>
+
+            <div class="bg-[#0d1117] p-5 rounded-lg border border-git-orange/30">
+              <span class="inline-block px-2.5 py-1 bg-git-orange/10 text-git-orange text-xs font-semibold rounded mb-3">Sistemas Distribuídos (ex: Git)</span>
+              <p class="text-sm text-gray-400 mb-4">Cada desenvolvedor possui uma cópia local **completa** do repositório no seu próprio computador, permitindo trabalhar offline com total segurança.</p>
+              <div class="flex items-center justify-center gap-4 py-4 text-git-orange">
+                <i data-lucide="laptop" class="w-8 h-8"></i>
+                <i data-lucide="arrow-left-right" class="w-6 h-6 text-gray-500"></i>
+                <i data-lucide="server" class="w-8 h-8"></i>
+                <i data-lucide="arrow-left-right" class="w-6 h-6 text-gray-500"></i>
+                <i data-lucide="laptop" class="w-8 h-8"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: O que é o Git + Comandos Essenciais -->
+    <section id="git" class="py-16 border-b border-git-border">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-git-orange/10 text-git-orange text-xs font-semibold mb-3"> Ferramenta CLI</div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">2. O que é o Git e seus Comandos Fundamentais</h2>
+          <p class="text-gray-400">O Git é o sistema de controle de versão distribuído mais popular do mundo. Ele roda localmente na sua máquina através da linha de comando ou terminal.</p>
+        </div>
+
+        <p class="text-center text-sm text-gray-400 mb-6">Clique nos cards abaixo para visualizar detalhes do comando:</p>
+
+        <!-- Cards Interativos de Comandos -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4" id="command-cards">
+          <!-- Card 1 -->
+          <div onclick="selectCommand('init')" id="card-init" class="cmd-card bg-git-card border border-git-orange/60 p-5 rounded-xl cursor-pointer hover:border-git-orange transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-git-orange font-bold">git init</span>
+              <i data-lucide="folder-plus" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <p class="text-xs text-gray-400">Inicializa um novo repositório Git em uma pasta.</p>
+          </div>
+
+          <!-- Card 2 -->
+          <div onclick="selectCommand('status')" id="card-status" class="cmd-card bg-git-card border border-git-border p-5 rounded-xl cursor-pointer hover:border-git-orange transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-git-orange font-bold">git status</span>
+              <i data-lucide="eye" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <p class="text-xs text-gray-400">Exibe o estado atual do repositório e arquivos alterados.</p>
+          </div>
+
+          <!-- Card 3 -->
+          <div onclick="selectCommand('add')" id="card-add" class="cmd-card bg-git-card border border-git-border p-5 rounded-xl cursor-pointer hover:border-git-orange transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-git-orange font-bold">git add</span>
+              <i data-lucide="plus-circle" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <p class="text-xs text-gray-400">Adiciona alterações para a Staging Area (preparação).</p>
+          </div>
+
+          <!-- Card 4 -->
+          <div onclick="selectCommand('commit')" id="card-commit" class="cmd-card bg-git-card border border-git-border p-5 rounded-xl cursor-pointer hover:border-git-orange transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-git-orange font-bold">git commit</span>
+              <i data-lucide="check-square" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <p class="text-xs text-gray-400">Salva o pacote de alterações no histórico local com uma mensagem.</p>
+          </div>
+
+          <!-- Card 5 -->
+          <div onclick="selectCommand('branch')" id="card-branch" class="cmd-card bg-git-card border border-git-border p-5 rounded-xl cursor-pointer hover:border-git-orange transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-git-orange font-bold">git branch</span>
+              <i data-lucide="git-branch" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <p class="text-xs text-gray-400">Cria, lista ou gerencia ramificações do projeto.</p>
+          </div>
+
+          <!-- Card 6 -->
+          <div onclick="selectCommand('merge')" id="card-merge" class="cmd-card bg-git-card border border-git-border p-5 rounded-xl cursor-pointer hover:border-git-orange transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-git-orange font-bold">git merge</span>
+              <i data-lucide="git-merge" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <p class="text-xs text-gray-400">Junta as alterações de uma branch em outra branch ativa.</p>
+          </div>
+
+          <!-- Card 7 -->
+          <div onclick="selectCommand('push')" id="card-push" class="cmd-card bg-git-card border border-git-border p-5 rounded-xl cursor-pointer hover:border-git-orange transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-git-orange font-bold">git push</span>
+              <i data-lucide="upload-cloud" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <p class="text-xs text-gray-400">Envia os commits locais para o repositório remoto (ex: GitHub).</p>
+          </div>
+
+          <!-- Card 8 -->
+          <div onclick="selectCommand('pull')" id="card-pull" class="cmd-card bg-git-card border border-git-border p-5 rounded-xl cursor-pointer hover:border-git-orange transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-git-orange font-bold">git pull</span>
+              <i data-lucide="download-cloud" class="w-5 h-5 text-gray-400"></i>
+            </div>
+            <p class="text-xs text-gray-400">Baixa e mescla atualizações do servidor remoto para sua máquina.</p>
+          </div>
+        </div>
+
+        <!-- Painel Detalhado do Comando Selecionado -->
+        <div class="mt-8 bg-git-card border border-git-border rounded-xl p-6 shadow-2xl relative overflow-hidden" id="command-details">
+          <div class="flex flex-col md:flex-row gap-6 items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <span id="cmd-title-badge" class="px-3 py-1 bg-git-orange/20 text-git-orange font-mono font-bold text-sm rounded">git init</span>
+                <span id="cmd-subtitle" class="text-gray-400 text-sm font-medium">Comando de Inicialização</span>
+              </div>
+              <p id="cmd-description" class="text-gray-300 text-base mb-4 leading-relaxed">
+                Cria um diretório `.git` oculto dentro da pasta selecionada. Esse diretório guarda todo o banco de dados e histórico de versionamento do projeto.
+              </p>
+            </div>
+
+            <!-- Terminal Simulado -->
+            <div class="w-full md:w-1/2 bg-[#0d1117] border border-git-border rounded-lg p-4 font-mono text-xs text-gray-300">
+              <div class="flex items-center justify-between pb-3 mb-3 border-b border-git-border">
+                <div class="flex gap-1.5">
+                  <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                  <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+                  <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+                </div>
+                <span class="text-gray-500 text-[10px]">bash / terminal</span>
+              </div>
+              <div id="cmd-code-example" class="space-y-1 text-gray-300">
+                <p class="text-gray-500"># Inicializa o repositório no diretório atual</p>
+                <p><span class="text-green-400">user@pc:~/meu-projeto$</span> git init</p>
+                <p class="text-blue-400">Initialized empty Git repository in /meu-projeto/.git/</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3: Fluxo de Trabalho (Git Architecture) -->
+    <section id="fluxo" class="py-16 border-b border-git-border bg-[#161b22]/40">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">3. Fluxo de Trabalho do Git (4 Áreas Principais)</h2>
+          <p class="text-gray-400">Entenda como o arquivo viaja desde a modificação local até ser publicado no GitHub.</p>
+        </div>
+
+        <!-- Diagrama Responsivo Interativo -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
+
+          <!-- Área 1: Working Directory -->
+          <div class="bg-git-card border border-git-border rounded-xl p-5 relative flex flex-col justify-between hover:border-gray-500 transition-all">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-mono font-bold text-sm">1</span>
+                <i data-lucide="file-text" class="w-5 h-5 text-red-400"></i>
+              </div>
+              <h3 class="text-white font-semibold text-lg mb-1">Working Directory</h3>
+              <p class="text-xs text-gray-400 mb-4">Arquivos onde você escreve código. Alterações não salvas no Git ficam neste estado.</p>
+            </div>
+            <div class="text-center pt-2 border-t border-git-border/50">
+              <span class="text-[11px] font-mono text-red-400 bg-red-500/10 px-2 py-1 rounded">Untracked / Modified</span>
+            </div>
+          </div>
+
+          <!-- Área 2: Staging Area -->
+          <div class="bg-git-card border border-git-border rounded-xl p-5 relative flex flex-col justify-between hover:border-gray-500 transition-all">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center font-mono font-bold text-sm">2</span>
+                <i data-lucide="layers" class="w-5 h-5 text-amber-400"></i>
+              </div>
+              <h3 class="text-white font-semibold text-lg mb-1">Staging Area</h3>
+              <p class="text-xs text-gray-400 mb-4">Área de preparação. Você seleciona quais arquivos farão parte do próximo "pacote".</p>
+            </div>
+            <div class="text-center pt-2 border-t border-git-border/50">
+              <span class="text-[11px] font-mono text-amber-400 bg-amber-500/10 px-2 py-1 rounded">git add</span>
+            </div>
+          </div>
+
+          <!-- Área 3: Local Repository -->
+          <div class="bg-git-card border border-git-border rounded-xl p-5 relative flex flex-col justify-between hover:border-gray-500 transition-all">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-mono font-bold text-sm">3</span>
+                <i data-lucide="database" class="w-5 h-5 text-blue-400"></i>
+              </div>
+              <h3 class="text-white font-semibold text-lg mb-1">Local Repository</h3>
+              <p class="text-xs text-gray-400 mb-4">O histórico salvo na sua máquina. O commit gera um código hash de identificação.</p>
+            </div>
+            <div class="text-center pt-2 border-t border-git-border/50">
+              <span class="text-[11px] font-mono text-blue-400 bg-blue-500/10 px-2 py-1 rounded">git commit</span>
+            </div>
+          </div>
+
+          <!-- Área 4: Remote Repository -->
+          <div class="bg-git-card border border-git-border rounded-xl p-5 relative flex flex-col justify-between hover:border-gray-500 transition-all">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center font-mono font-bold text-sm">4</span>
+                <i data-lucide="cloud" class="w-5 h-5 text-purple-400"></i>
+              </div>
+              <h3 class="text-white font-semibold text-lg mb-1">Remote (GitHub)</h3>
+              <p class="text-xs text-gray-400 mb-4">Servidor na nuvem onde a equipe colabora e compartilha as alterações salvas.</p>
+            </div>
+            <div class="text-center pt-2 border-t border-git-border/50">
+              <span class="text-[11px] font-mono text-purple-400 bg-purple-500/10 px-2 py-1 rounded">git push</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4: O que é o GitHub -->
+    <section id="github" class="py-16 border-b border-git-border">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-git-purple/20 text-purple-300 text-xs font-semibold mb-3">Plataforma Cloud</div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">4. O que é o GitHub?</h2>
+          <p class="text-gray-400">Se o Git é o motor do carro, o GitHub é a rodovia inteira. É uma plataforma web que hospeda repositórios Git e adiciona recursos colaborativos e sociais.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="bg-git-card border border-git-border p-6 rounded-xl hover:border-git-purple/50 transition-all">
+            <div class="w-10 h-10 rounded-lg bg-git-purple/20 text-purple-400 flex items-center justify-center mb-4">
+              <i data-lucide="folder" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Repositórios</h3>
+            <p class="text-sm text-gray-400">Espaço onde todos os arquivos de um projeto, juntamente com o histórico do Git, ficam armazenados na nuvem.</p>
+          </div>
+
+          <div class="bg-git-card border border-git-border p-6 rounded-xl hover:border-git-purple/50 transition-all">
+            <div class="w-10 h-10 rounded-lg bg-git-purple/20 text-purple-400 flex items-center justify-center mb-4">
+              <i data-lucide="git-pull-request" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Pull Requests (PR)</h3>
+            <p class="text-sm text-gray-400">Uma solicitação para mesclar as alterações da sua branch na branch principal do projeto com revisão de código.</p>
+          </div>
+
+          <div class="bg-git-card border border-git-border p-6 rounded-xl hover:border-git-purple/50 transition-all">
+            <div class="w-10 h-10 rounded-lg bg-git-purple/20 text-purple-400 flex items-center justify-center mb-4">
+              <i data-lucide="bug" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Issues</h3>
+            <p class="text-sm text-gray-400">Quadro para relatar bugs, sugerir novas funcionalidades ou planejar tarefas do projeto.</p>
+          </div>
+
+          <div class="bg-git-card border border-git-border p-6 rounded-xl hover:border-git-purple/50 transition-all">
+            <div class="w-10 h-10 rounded-lg bg-git-purple/20 text-purple-400 flex items-center justify-center mb-4">
+              <i data-lucide="git-fork" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Forks</h3>
+            <p class="text-sm text-gray-400">Cria uma cópia completa de um repositório de outro usuário na sua própria conta do GitHub para fazer edições.</p>
+          </div>
+
+          <div class="bg-git-card border border-git-border p-6 rounded-xl hover:border-git-purple/50 transition-all">
+            <div class="w-10 h-10 rounded-lg bg-git-purple/20 text-purple-400 flex items-center justify-center mb-4">
+              <i data-lucide="play" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">GitHub Actions</h3>
+            <p class="text-sm text-gray-400">Ferramenta de Automação e CI/CD para executar testes automatizados e deploys a cada commit.</p>
+          </div>
+
+          <div class="bg-git-card border border-git-border p-6 rounded-xl hover:border-git-purple/50 transition-all">
+            <div class="w-10 h-10 rounded-lg bg-git-purple/20 text-purple-400 flex items-center justify-center mb-4">
+              <i data-lucide="globe" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">GitHub Pages</h3>
+            <p class="text-sm text-gray-400">Hospedagem gratuita diretamente do seu repositório para publicar sites e páginas estáticas na web.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5: Cheat Sheet de Comandos com Filtro -->
+    <section id="cheatsheet" class="py-16 border-b border-git-border bg-[#161b22]/40">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">5. Guia Rápido de Comandos (Cheat Sheet)</h2>
+            <p class="text-gray-400">Filtre e copie os comandos mais utilizados no dia a dia do desenvolvedor.</p>
+          </div>
+
+          <!-- Filtros de Categoria -->
+          <div class="flex flex-wrap gap-2">
+            <button onclick="filterCheatSheet('all')" class="filter-btn active px-3 py-1.5 rounded-lg text-xs font-semibold bg-git-orange text-white border border-git-orange transition-all">Todos</button>
+            <button onclick="filterCheatSheet('basico')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-git-card text-gray-400 border border-git-border hover:text-white transition-all">Básico</button>
+            <button onclick="filterCheatSheet('branches')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-git-card text-gray-400 border border-git-border hover:text-white transition-all">Branches</button>
+            <button onclick="filterCheatSheet('sincronizacao')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-git-card text-gray-400 border border-git-border hover:text-white transition-all">Sincronização</button>
+          </div>
+        </div>
+
+        <!-- Tabela de Comandos -->
+        <div class="grid gap-3" id="cheatsheet-list">
+          <!-- Item 1 -->
+          <div class="cs-item basico bg-git-card border border-git-border rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-sm text-git-orange font-semibold mb-1">git config --global user.name "Seu Nome"</div>
+              <p class="text-xs text-gray-400">Configura o nome do autor que aparecerá nos commits.</p>
+            </div>
+            <button onclick="copyToClipboard('git config --global user.name &quot;Seu Nome&quot;')" class="shrink-0 px-3 py-1.5 bg-[#0d1117] hover:bg-git-border border border-git-border text-gray-300 rounded text-xs font-mono flex items-center gap-1.5 transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+            </button>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="cs-item basico bg-git-card border border-git-border rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-sm text-git-orange font-semibold mb-1">git add .</div>
+              <p class="text-xs text-gray-400">Adiciona todos os arquivos modificados e novos para o estágio de preparação (Stage).</p>
+            </div>
+            <button onclick="copyToClipboard('git add .')" class="shrink-0 px-3 py-1.5 bg-[#0d1117] hover:bg-git-border border border-git-border text-gray-300 rounded text-xs font-mono flex items-center gap-1.5 transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+            </button>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="cs-item basico bg-git-card border border-git-border rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-sm text-git-orange font-semibold mb-1">git commit -m "Sua mensagem aqui"</div>
+              <p class="text-xs text-gray-400">Salva as alterações preparadas no repositório com uma mensagem descritiva.</p>
+            </div>
+            <button onclick="copyToClipboard('git commit -m &quot;Minha alteracao&quot;')" class="shrink-0 px-3 py-1.5 bg-[#0d1117] hover:bg-git-border border border-git-border text-gray-300 rounded text-xs font-mono flex items-center gap-1.5 transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+            </button>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="cs-item branches bg-git-card border border-git-border rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-sm text-git-orange font-semibold mb-1">git checkout -b minha-nova-branch</div>
+              <p class="text-xs text-gray-400">Cria uma nova ramificação e muda para ela imediatamente.</p>
+            </div>
+            <button onclick="copyToClipboard('git checkout -b minha-nova-branch')" class="shrink-0 px-3 py-1.5 bg-[#0d1117] hover:bg-git-border border border-git-border text-gray-300 rounded text-xs font-mono flex items-center gap-1.5 transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+            </button>
+          </div>
+
+          <!-- Item 5 -->
+          <div class="cs-item branches bg-git-card border border-git-border rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-sm text-git-orange font-semibold mb-1">git switch main</div>
+              <p class="text-xs text-gray-400">Navega/alterna para a branch principal (`main`).</p>
+            </div>
+            <button onclick="copyToClipboard('git switch main')" class="shrink-0 px-3 py-1.5 bg-[#0d1117] hover:bg-git-border border border-git-border text-gray-300 rounded text-xs font-mono flex items-center gap-1.5 transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+            </button>
+          </div>
+
+          <!-- Item 6 -->
+          <div class="cs-item sincronizacao bg-git-card border border-git-border rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-sm text-git-orange font-semibold mb-1">git remote add origin https://github.com/usuario/repo.git</div>
+              <p class="text-xs text-gray-400">Conecta seu repositório local ao repositório remoto hospedado no GitHub.</p>
+            </div>
+            <button onclick="copyToClipboard('git remote add origin URL')" class="shrink-0 px-3 py-1.5 bg-[#0d1117] hover:bg-git-border border border-git-border text-gray-300 rounded text-xs font-mono flex items-center gap-1.5 transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+            </button>
+          </div>
+
+          <!-- Item 7 -->
+          <div class="cs-item sincronizacao bg-git-card border border-git-border rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-sm text-git-orange font-semibold mb-1">git push -u origin main</div>
+              <p class="text-xs text-gray-400">Envia a branch local `main` para o servidor remoto e a define como padrão.</p>
+            </div>
+            <button onclick="copyToClipboard('git push -u origin main')" class="shrink-0 px-3 py-1.5 bg-[#0d1117] hover:bg-git-border border border-git-border text-gray-300 rounded text-xs font-mono flex items-center gap-1.5 transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6: Quiz Interativo -->
+    <section id="quiz" class="py-16 border-b border-git-border">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+          <span class="px-3 py-1 bg-green-500/10 text-green-400 text-xs font-semibold rounded-full border border-green-500/20">Desafio de Fixação</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white mt-2">6. Teste Seus Conhecimentos</h2>
+          <p class="text-gray-400 text-sm">Responda às questões para avaliar o que aprendeu.</p>
+        </div>
+
+        <div class="bg-git-card border border-git-border rounded-xl p-6 sm:p-8" id="quiz-container">
+          <div id="quiz-header" class="flex items-center justify-between border-b border-git-border pb-4 mb-6">
+            <span class="text-xs font-mono text-gray-400" id="quiz-progress">Questão 1 de 3</span>
+            <span class="text-xs font-mono text-git-orange" id="quiz-score">Pontuação: 0</span>
+          </div>
+
+          <!-- Questão Dinâmica -->
+          <div id="quiz-body">
+            <h3 class="text-lg font-semibold text-white mb-6" id="quiz-question">Carregando pergunta...</h3>
+            <div class="space-y-3" id="quiz-options">
+              <!-- Opções inseridas via JS -->
+            </div>
+          </div>
+
+          <!-- Botão de Próxima / Reiniciar -->
+          <div id="quiz-footer" class="mt-6 flex justify-end hidden">
+            <button onclick="nextQuestion()" id="quiz-next-btn" class="px-5 py-2.5 bg-git-orange hover:bg-orange-600 text-white font-semibold text-sm rounded-lg transition-all flex items-center gap-2">
+              Próxima Questão <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[#0d1117] border-t border-git-border py-8 text-center text-xs text-gray-500">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="mb-2">Desenvolvido como um guia educativo e interativo de Git & GitHub.</p>
+      <p>© 2026 - Livre para fins educacionais.</p>
+    </div>
+  </footer>
+
+  <!-- Lógica JavaScript -->
+  <script>
+    // Inicializar Ícones Lucide
+    lucide.createIcons();
+
+    // Base de dados dos comandos para o painel interativo
+    const commandsData = {
+      init: {
+        title: 'git init',
+        subtitle: 'Inicialização de Repositório',
+        description: 'Cria um novo repositório Git em branco ou reinicializa um existente no diretório atual.',
+        example: `<p class="text-gray-500"># Inicializa o repositório no diretório atual</p>
+<p><span class="text-green-400">user@pc:~/projeto$</span> git init</p>
+<p class="text-blue-400">Initialized empty Git repository in /home/user/projeto/.git/</p>`
+      },
+      status: {
+        title: 'git status',
+        subtitle: 'Verificação de Estado',
+        description: 'Exibe o estado dos arquivos no diretório de trabalho e na staging area (arquivos modificados, novos ou deletados).',
+        example: `<p class="text-gray-500"># Verifica o status dos arquivos</p>
+<p><span class="text-green-400">user@pc:~/projeto$</span> git status</p>
+<p class="text-red-400">Untracked files: index.html</p>`
+      },
+      add: {
+        title: 'git add',
+        subtitle: 'Preparação de Arquivos (Stage)',
+        description: 'Adiciona alterações do diretório de trabalho para a Staging Area, preparando os arquivos para o próximo commit.',
+        example: `<p class="text-gray-500"># Adiciona um arquivo específico ou todos (.)</p>
+<p><span class="text-green-400">user@pc:~/projeto$</span> git add index.html</p>
+<p class="text-gray-500"># Ou para preparar tudo:</p>
+<p><span class="text-green-400">user@pc:~/projeto$</span> git add .</p>`
+      },
+      commit: {
+        title: 'git commit',
+        subtitle: 'Confirmação do Histórico',
+        description: 'Grava permanentemente o instantâneo (snapshot) dos arquivos preparados no histórico local do repositório.',
+        example: `<p class="text-gray-500"># Cria um commit com mensagem</p>
+<p><span class="text-green-400">user@pc:~/projeto$</span> git commit -m "feat: adiciona tela de login"</p>
+<p class="text-green-400">[main a1b2c3d] feat: adiciona tela de login</p>`
+      },
+      branch: {
+        title: 'git branch',
+        subtitle: 'Gestão de Ramificações',
+        description: 'Lista, cria ou exclui branches. As branches permitem desenvolver recursos de forma isolada.',
+        example: `<p class="text-gray-500"># Cria uma nova branch chamada 'feature-header'</p>
+<p><span class="text-green-400">user@pc:~/projeto$</span> git branch feature-header</p>
+<p class="text-gray-500"># Lista as branches existentes</p>
+<p><span class="text-green-400">user@pc:~/projeto$</span> git branch</p>`
+      },
+      merge: {
+        title: 'git merge',
+        subtitle: 'Fusão de Históricos',
+        description: 'Combina as linhas de desenvolvimento e histórico de uma branch especificada na branch atual.',
+        example: `<p class="text-gray-500"># Mescla a branch 'feature' na branch atual (ex: main)</p>
+<p><span class="text-green-400">user@pc:~/projeto$</span> git merge feature-header</p>
+<p class="text-blue-400">Updating a1b2c3d..e4f5g6h - Fast-forward</p>`
+      },
+      push: {
+        title: 'git push',
+        subtitle: 'Envio para o Servidor Remoto',
+        description: 'Envia todos os commits realizados localmente para o repositório correspondente no GitHub.',
+        example: `<p class="text-gray-500"># Envia alterações para o servidor remoto</p>
+<p><span class="text-green-400">user@pc:~/projeto$</span> git push origin main</p>
+<p class="text-purple-400">To https://github.com/user/repo.git -> main</p>`
+      },
+      pull: {
+        title: 'git pull',
+        subtitle: 'Sincronização com Remoto',
+        description: 'Busca as atualizações do servidor remoto (ex: GitHub) e as mescla imediatamente na sua branch local.',
+        example: `<p class="text-gray-500"># Baixa as novidades do repositório remoto</p>
+<p><span class="text-green-400">user@pc:~/projeto$</span> git pull origin main</p>
+<p class="text-blue-400">Already up to date.</p>`
+      }
+    };
+
+    // Função para trocar o comando em destaque
+    function selectCommand(key) {
+      const cmd = commandsData[key];
+      if (!cmd) return;
+
+      // Atualiza bordas dos cards
+      document.querySelectorAll('.cmd-card').forEach(card => {
+        card.classList.remove('border-git-orange');
+        card.classList.add('border-git-border');
+      });
+      const selectedCard = document.getElementById(`card-${key}`);
+      if (selectedCard) {
+        selectedCard.classList.remove('border-git-border');
+        selectedCard.classList.add('border-git-orange');
+      }
+
+      // Atualiza conteúdo do painel
+      document.getElementById('cmd-title-badge').innerText = cmd.title;
+      document.getElementById('cmd-subtitle').innerText = cmd.subtitle;
+      document.getElementById('cmd-description').innerText = cmd.description;
+      document.getElementById('cmd-code-example').innerHTML = cmd.example;
+    }
+
+    // Copiar Comando para Área de Transferência
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      // Mostrar Toast Notification
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.innerText = `Copiado: "${text}"`;
+      
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+
+    // Filtro do Cheat Sheet
+    function filterCheatSheet(category) {
+      const items = document.querySelectorAll('.cs-item');
+      const buttons = document.querySelectorAll('.filter-btn');
+
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-git-orange', 'text-white');
+        btn.classList.add('bg-git-card', 'text-gray-400');
+      });
+
+      event.target.classList.remove('bg-git-card', 'text-gray-400');
+      event.target.classList.add('bg-git-orange', 'text-white');
+
+      items.forEach(item => {
+        if (category === 'all' || item.classList.contains(category)) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // Base de Questões do Quiz
+    const quizQuestions = [
+      {
+        question: "Qual comando é utilizado para salvar as alterações preparadas no histórico do Git local?",
+        options: [
+          { text: "git push", correct: false },
+          { text: "git commit -m 'mensagem'", correct: true },
+          { text: "git add .", correct: false },
+          { text: "git save", correct: false }
+        ]
+      },
+      {
+        question: "O que é a 'Staging Area' (Área de Preparação) no Git?",
+        options: [
+          { text: "O servidor remoto do GitHub onde o código fica salvo público.", correct: false },
+          { text: "Uma área intermediária onde você seleciona os arquivos que deseja incluir no próximo commit.", correct: true },
+          { text: "A lixeira do Git onde arquivos deletados ficam guardados.", correct: false },
+          { text: "A linha do tempo do projeto após o merge.", correct: false }
+        ]
+      },
+      {
+        question: "Qual a diferença fundamental entre Git e GitHub?",
+        options: [
+          { text: "Não há diferença, são marcas da mesma empresa.", correct: false },
+          { text: "Git é o sistema de controle de versão local; GitHub é o serviço na nuvem para hospedar repositórios.", correct: true },
+          { text: "GitHub roda no terminal; Git é apenas uma interface gráfica.", correct: false },
+          { text: "Git é pago e o GitHub é totalmente código aberto sem servidor.", correct: false }
+        ]
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function renderQuestion() {
+      answered = false;
+      const q = quizQuestions[currentQuestionIndex];
+      document.getElementById('quiz-progress').innerText = `Questão ${currentQuestionIndex + 1} de ${quizQuestions.length}`;
+      document.getElementById('quiz-score').innerText = `Pontuação: ${score}`;
+      document.getElementById('quiz-question').innerText = q.question;
+
+      const optionsContainer = document.getElementById('quiz-options');
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-4 rounded-lg bg-[#0d1117] border border-git-border hover:border-git-orange text-sm text-gray-300 transition-all flex items-center justify-between";
+        btn.innerHTML = `<span>${opt.text}</span> <i data-lucide="circle" class="w-4 h-4 text-gray-600"></i>`;
+        btn.onclick = () => checkAnswer(idx, btn, opt.correct);
+        optionsContainer.appendChild(btn);
+      });
+
+      document.getElementById('quiz-footer').classList.add('hidden');
+      lucide.createIcons();
+    }
+
+    function checkAnswer(selectedIndex, button, isCorrect) {
+      if (answered) return;
+      answered = true;
+
+      const buttons = document.getElementById('quiz-options').children;
+
+      if (isCorrect) {
+        button.classList.remove('bg-[#0d1117]', 'border-git-border');
+        button.classList.add('bg-green-500/20', 'border-green-500', 'text-green-300');
+        button.querySelector('i').replaceWith(createIcon('check-circle-2', 'text-green-400'));
+        score += 10;
+      } else {
+        button.classList.remove('bg-[#0d1117]', 'border-git-border');
+        button.classList.add('bg-red-500/20', 'border-red-500', 'text-red-300');
+        button.querySelector('i').replaceWith(createIcon('x-circle', 'text-red-400'));
+
+        // Destacar a correta
+        quizQuestions[currentQuestionIndex].options.forEach((opt, i) => {
+          if (opt.correct) {
+            buttons[i].classList.remove('bg-[#0d1117]', 'border-git-border');
+            buttons[i].classList.add('bg-green-500/20', 'border-green-500', 'text-green-300');
+          }
+        });
+      }
+
+      document.getElementById('quiz-score').innerText = `Pontuação: ${score}`;
+      document.getElementById('quiz-footer').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function createIcon(name, colorClass) {
+      const i = document.createElement('i');
+      i.setAttribute('data-lucide', name);
+      i.className = `w-4 h-4 ${colorClass}`;
+      return i;
+    }
+
+    function nextQuestion() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < quizQuestions.length) {
+        renderQuestion();
+      } else {
+        showQuizResults();
+      }
+    }
+
+    function showQuizResults() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = `
+        <div class="text-center py-8">
+          <div class="w-16 h-16 bg-git-orange/20 text-git-orange rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="trophy" class="w-8 h-8"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-2">Quiz Concluído!</h3>
+          <p class="text-gray-400 mb-6">Sua pontuação final foi <span class="text-git-orange font-bold">${score}</span> de ${quizQuestions.length * 10} pontos.</p>
+          <button onclick="restartQuiz()" class="px-6 py-2.5 bg-git-orange hover:bg-orange-600 text-white font-semibold text-sm rounded-lg transition-all inline-flex items-center gap-2">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Refazer Quiz
+          </button>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function restartQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      location.reload();
+    }
+
+    // Inicializar Quiz
+    renderQuestion();
+  </script>
+</body>
+</html>
